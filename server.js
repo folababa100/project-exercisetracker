@@ -40,7 +40,7 @@ app.post("/api/exercise/new-user", async (req, res) => {
     })
 
     if(getUser) {
-      return res.status(2000).send("User already exists");
+      return res.status(200).send("User already exists");
     }
 
     const user = new User({
@@ -173,6 +173,9 @@ app.get("/api/exercise/log?{userId}[&from][&to][&limit]", async (req, res) => {
     const findUser = await User.findOne({
       _id: userId,
     });
+    if(!findUser) {
+      return res.status(500).send("Unknown userId");
+    }
 
     const exercises = await Exercise.find(
       {
