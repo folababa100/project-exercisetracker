@@ -40,7 +40,7 @@ app.post("/api/exercise/new-user", async (req, res) => {
     })
 
     if(getUser) {
-      return res.status(200).send("User already exists");
+      return res.status(200).json("User already exists");
     }
 
     const user = new User({
@@ -65,7 +65,7 @@ app.get("/api/exercise/users", async (req, res) => {
   try {
     const users = await User.find().exec();
 
-    res.status(200).send(users);
+    res.status(200).json(users);
   } catch (err) {
     if (err) {
       console.log("err", err);
@@ -123,7 +123,7 @@ app.post("/api/exercise/add", async (req, res) => {
 //   try {
 //     const count = await Exercise.find().countDocuments();
 
-//     res.status(200).send(count);
+//     res.status(200).json(count);
 //   } catch (err) {
 //     if (err) {
 //       console.log("err", err);
@@ -143,7 +143,7 @@ app.get("/api/exercise/log", async (req, res) => {
       _id: userId,
     });
     if(!findUser) {
-      return res.status(500).send("Unknown userId");
+      return res.status(500).json("Unknown userId");
     }
 
     const exercises = await Exercise.find(
@@ -161,6 +161,21 @@ app.get("/api/exercise/log", async (req, res) => {
       }
     ).limit(limit ? parseInt(limit) : 1);
 
+    const exercisesDocumentNumber = await Exercise.find(
+      {
+        userId,
+        date: {
+          $gte: from ? new Date(from) : new Date(0),
+          $lt: from ? new Date(to) : new Date(),
+        },
+      },
+      {
+        description: 1,
+        duration: 1,
+        date: 1,
+      }
+    ).limit(limit ? parseInt(limit) : 1).countDocuments()
+
     res.status(200).json({
       _id: findUser._id,
       username: findUser.username,
@@ -171,6 +186,7 @@ app.get("/api/exercise/log", async (req, res) => {
       to: to
         ? moment(new Date(to)).format("ddd MMM DD YYYY")
         : moment(new Date()).format("ddd MMM DD YYYY"),
+      count: exercisesDocumentNumber,
     });
   } catch (err) {
     if (err) {
@@ -185,7 +201,7 @@ app.get("/api/exercise/log", async (req, res) => {
 });
 
 app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/views/index.html')
+  res.jsonFile(__dirname + '/views/index.html')
 });
 
 
