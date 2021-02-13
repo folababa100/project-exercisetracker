@@ -4,7 +4,10 @@ const { Schema } = mongoose;
 
 const exerciseSchema = Schema({
   description: String,
-  date: Date.now,
+  date: {
+    type: Date,
+    default: Date.now
+  },
   duration: String,
   userId: {
     type: Schema.Types.ObjectId,
