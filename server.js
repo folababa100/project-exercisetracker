@@ -101,50 +101,19 @@ app.post("/api/exercise/add", async (req, res) => {
     const newExecise = await exercise.save();
     console.log("findUser", findUser);
     console.log("newExecise", newExecise);
-    res
-      .status(200)
-      .json({
-        _id: findUser._id,
-        username: findUser.username,
-        description: newExecise.description,
-        duration: newExecise.duration,
-        date: newExecise.date,
-      });
+    res.status(200).json({
+      _id: findUser._id,
+      username: findUser.username,
+      description: newExecise.description,
+      duration: newExecise.duration,
+      date: moment(newExecise.date).format("ddd MMM DD YYYY"),
+    });
   } catch (err) {
     if (err) {
       console.log("err", err);
       res.status(500).json({
         success: false,
         message: "Excercise creation was unsucessful",
-      });
-    }
-  }
-});
-
-app.get("/api/exercise/log/:userId", async (req, res) => {
-  const { userId } = req.params;
-  try {
-    const exercises = await Exercise.find(
-      {
-        userId,
-      },
-      {
-        description: 1,
-        duration: 1,
-        date: 1,
-        _id: 0
-      }
-    ).exec();
-
-    console.log("exercises", exercises);
-    res.status(200).send(exercises);
-  } catch (err) {
-    if (err) {
-      console.log("err", err);
-      res.status(500).json({
-        success: false,
-        message: "Exercise collections failed",
-        err,
       });
     }
   }
@@ -167,7 +136,7 @@ app.get("/api/exercise/log/:userId", async (req, res) => {
 //   }
 // });
 
-app.get("/api/exercise/log?{userId}[&from][&to][&limit]", async (req, res) => {
+app.get("/api/exercise/log", async (req, res) => {
   const { from, to, limit, userId } = req.query;
   try {
     const findUser = await User.findOne({
@@ -181,8 +150,8 @@ app.get("/api/exercise/log?{userId}[&from][&to][&limit]", async (req, res) => {
       {
         userId,
         date: {
-          $gte: new Date(from),
-          $lt: new Date(to),
+          $gte: from ? new Date(from) : new Date(0),
+          $lt: from ? new Date(to) : new Date(),
         },
       },
       {
@@ -196,8 +165,12 @@ app.get("/api/exercise/log?{userId}[&from][&to][&limit]", async (req, res) => {
       _id: findUser._id,
       username: findUser.username,
       log: exercises,
-      from: from ? moment(new Date(from)).format("ddd MMM DD YYYY") : null,
-      to: to ? moment(new Date(to)).format("ddd MMM DD YYYY") : null,
+      from: from
+        ? moment(new Date(from)).format("ddd MMM DD YYYY")
+        : moment(new Date(0)).format("ddd MMM DD YYYY"),
+      to: to
+        ? moment(new Date(to)).format("ddd MMM DD YYYY")
+        : moment(new Date()).format("ddd MMM DD YYYY"),
     });
   } catch (err) {
     if (err) {
