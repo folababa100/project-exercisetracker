@@ -41,11 +41,7 @@ app.post("/api/exercise/new-user", async (req, res) => {
 
     const newUser = await user.save();
 
-    res.status(201).json({
-      success: true,
-      user: newUser,
-      message: "User creation was sucessful",
-    });
+    res.status(201).json(newUser);
   } catch (err) {
     if(err) {
       console.log("err", err);
@@ -61,10 +57,7 @@ app.get("/api/exercise/users", async (req, res) => {
   try {
     const users = await User.find().exec();
 
-    res.status(200).json({
-      success: true,
-      users
-    });
+    res.status(200).send(users);
   } catch (err) {
     if (err) {
       console.log("err", err);
@@ -89,11 +82,7 @@ app.post("/api/exercise/add", async (req, res) => {
 
     const newExecise = await exercise.save();
 
-    res.status(200).json({
-      exercise: newExecise,
-      success: true,
-      message: "Excercise creation was sucessful",
-    });
+    res.status(200).json(newExecise);
   } catch (err) {
     if (err) {
       console.log("err", err);
@@ -112,10 +101,7 @@ app.get("/api/exercise/log/:userId", async (req, res) => {
       userId
     }).exec();
 
-    res.status(200).json({
-      success: true,
-      exercises,
-    });
+    res.status(200).send(exercises);
   } catch (err) {
     if (err) {
       console.log("err", err);
@@ -132,10 +118,7 @@ app.get("/api/exercise/log/", async (req, res) => {
   try {
     const count = await Exercise.find().countDocuments();
 
-    res.status(200).json({
-      success: true,
-      count,
-    });
+    res.status(200).send(count);
   } catch (err) {
     if (err) {
       console.log("err", err);
@@ -158,10 +141,7 @@ app.get("/api/exercise/log/:from/:to/:limit", async (req, res) => {
       },
     }).limit(limit);
 
-    res.status(200).json({
-      success: true,
-      exercises,
-    });
+    res.status(200).send(exercises);
   } catch (err) {
     if (err) {
       console.log("err", err);
