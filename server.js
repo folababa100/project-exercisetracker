@@ -35,6 +35,14 @@ app.post("/api/exercise/new-user", async (req, res) => {
   const { username } = req.body;
 
   try {
+    const getUser = await User.findOne({
+      username
+    })
+
+    if(getUser) {
+      return res.status(2000).send("User already exists");
+    }
+
     const user = new User({
       username
     })
@@ -77,7 +85,7 @@ app.post("/api/exercise/add", async (req, res) => {
       userId,
       description,
       duration,
-      date: new Date(date),
+      date,
     });
     const findUser = await User.findOne({
       _id: userId
@@ -85,7 +93,15 @@ app.post("/api/exercise/add", async (req, res) => {
     const newExecise = await exercise.save();
     console.log("findUser", findUser);
     console.log("newExecise", newExecise);
-    res.status(200).json({ ...newExecise, ...findUser });
+    res
+      .status(200)
+      .json({
+        _id: findUser._id,
+        username: findUser.username,
+        description: newExecise.description,
+        duration: newExecise.duration,
+        date: newExecise.date,
+      });
   } catch (err) {
     if (err) {
       console.log("err", err);
@@ -107,11 +123,12 @@ app.get("/api/exercise/log/:userId", async (req, res) => {
       {
         description: 1,
         duration: 1,
-        date: 1
+        date: 1,
+        _id: 0
       }
     ).exec();
 
-
+    console.log("exercises", exercises);
     res.status(200).send(exercises);
   } catch (err) {
     if (err) {
@@ -142,11 +159,16 @@ app.get("/api/exercise/log/", async (req, res) => {
   }
 });
 
-app.get("/api/exercise/log/:from/:to/:limit", async (req, res) => {
-  const { from, to, limit } = req.params;
+app.get("/api/exercise/log?{userId}[&from][&to][&limit]", async (req, res) => {
+  const { from, to, limit, userId } = req.query;
   try {
+    const findUser = await User.findOne({
+      _id: userId,
+    });
+
     const exercises = await Exercise.find(
       {
+        userId,
         date: {
           $gte: new Date(from),
           $lt: new Date(to),
@@ -157,9 +179,15 @@ app.get("/api/exercise/log/:from/:to/:limit", async (req, res) => {
         duration: 1,
         date: 1,
       }
-    ).limit(limit);
+    ).limit(limit ? parseInt(limit) : 1);
 
-    res.status(200).send(exercises);
+    res.status(200).json({
+      _id: findUser._id,
+      username: findUser.username,
+      log: exercises,
+      from: from ? moment(new Date(from)).format("ddd MMM DD YYYY") : null,
+      to: to ? moment(new Date(to)).format("ddd MMM DD YYYY") : null,
+    });
   } catch (err) {
     if (err) {
       console.log("err", err);
