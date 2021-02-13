@@ -10,7 +10,7 @@ const mongoose = require("mongoose");
 
 mongoose
   .connect(
-    "mongodb+srv://folababa:folababa@cluster0.oio2g.mongodb.net/<dbname>?retryWrites=true&w=majority",
+    "mongodb+srv://folababa:folababa@cluster0.oio2g.mongodb.net/exercisetracker?retryWrites=true&w=majority",
     {
       useNewUrlParser: true,
       useUnifiedTopology: true,
@@ -150,22 +150,22 @@ app.get("/api/exercise/log/:userId", async (req, res) => {
   }
 });
 
-app.get("/api/exercise/log/", async (req, res) => {
-  try {
-    const count = await Exercise.find().countDocuments();
+// app.get("/api/exercise/log/", async (req, res) => {
+//   try {
+//     const count = await Exercise.find().countDocuments();
 
-    res.status(200).send(count);
-  } catch (err) {
-    if (err) {
-      console.log("err", err);
-      res.status(500).json({
-        success: false,
-        message: "Count collections failed",
-        err,
-      });
-    }
-  }
-});
+//     res.status(200).send(count);
+//   } catch (err) {
+//     if (err) {
+//       console.log("err", err);
+//       res.status(500).json({
+//         success: false,
+//         message: "Count collections failed",
+//         err,
+//       });
+//     }
+//   }
+// });
 
 app.get("/api/exercise/log?{userId}[&from][&to][&limit]", async (req, res) => {
   const { from, to, limit, userId } = req.query;
