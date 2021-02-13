@@ -20,6 +20,7 @@ mongoose
   )
   .catch((err) => console.error(err, mongoose.connection.readyState));
 
+
 app.use(cors())
 
 app.use(bodyParser.urlencoded({ extended: false }));
