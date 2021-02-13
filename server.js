@@ -151,12 +151,13 @@ app.get("/api/exercise/log", async (req, res) => {
         userId,
         date: {
           $gte: from ? new Date(from) : new Date(0),
-          $lt: from ? new Date(to) : new Date(),
+          $lte: from ? new Date(to) : new Date(),
         },
       },
       {
         description: 1,
         duration: 1,
+        _id: 0,
         date: 1,
       }
     ).limit(limit ? parseInt(limit) : 1);
