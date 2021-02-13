@@ -81,12 +81,20 @@ app.get("/api/exercise/users", async (req, res) => {
 app.post("/api/exercise/add", async (req, res) => {
   const { userId, description, duration, date } = req.body;
   try {
-    const exercise = new Exercise({
-      userId,
-      description,
-      duration,
-      date: new Date(date),
-    });
+    const exercise = new Exercise(
+      date
+        ? {
+            userId,
+            description,
+            duration,
+            date: new Date(date),
+          }
+        : {
+            userId,
+            description,
+            duration,
+          }
+    );
     const findUser = await User.findOne({
       _id: userId
     })
