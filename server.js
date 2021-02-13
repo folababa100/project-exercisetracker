@@ -83,7 +83,8 @@ app.post("/api/exercise/add", async (req, res) => {
       _id: userId
     })
     const newExecise = await exercise.save();
-
+    console.log("findUser", findUser);
+    console.log("newExecise", newExecise);
     res.status(200).json({ ...newExecise, ...findUser });
   } catch (err) {
     if (err) {
