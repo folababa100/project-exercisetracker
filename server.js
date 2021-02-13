@@ -77,12 +77,14 @@ app.post("/api/exercise/add", async (req, res) => {
       userId,
       description,
       duration,
-      date,
+      date: new Date(date),
     });
-
+    const findUser = await User.findOne({
+      _id: userId
+    })
     const newExecise = await exercise.save();
 
-    res.status(200).json(newExecise);
+    res.status(200).json({ ...newExecise, ...findUser });
   } catch (err) {
     if (err) {
       console.log("err", err);
@@ -97,9 +99,17 @@ app.post("/api/exercise/add", async (req, res) => {
 app.get("/api/exercise/log/:userId", async (req, res) => {
   const { userId } = req.params;
   try {
-    const exercises = await Exercise.find({
-      userId
-    }).exec();
+    const exercises = await Exercise.find(
+      {
+        userId,
+      },
+      {
+        description: 1,
+        duration: 1,
+        date: 1
+      }
+    ).exec();
+
 
     res.status(200).send(exercises);
   } catch (err) {
@@ -134,12 +144,19 @@ app.get("/api/exercise/log/", async (req, res) => {
 app.get("/api/exercise/log/:from/:to/:limit", async (req, res) => {
   const { from, to, limit } = req.params;
   try {
-    const exercises = await Exercise.find({
-      date: {
-        $gte: new Date(from),
-        $lt: new Date(to),
+    const exercises = await Exercise.find(
+      {
+        date: {
+          $gte: new Date(from),
+          $lt: new Date(to),
+        },
       },
-    }).limit(limit);
+      {
+        description: 1,
+        duration: 1,
+        date: 1,
+      }
+    ).limit(limit);
 
     res.status(200).send(exercises);
   } catch (err) {
