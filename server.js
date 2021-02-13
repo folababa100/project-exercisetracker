@@ -9,15 +9,12 @@ const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 
 mongoose
-  .connect(
-    "mongodb+srv://folababa:folababa@cluster0.oio2g.mongodb.net/<dbname>?retryWrites=true&w=majority",
-    {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-      useFindAndModify: false,
-      useCreateIndex: true,
-    }
-  )
+  .connect(process.env.MONGODB_URL, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    useFindAndModify: false,
+    useCreateIndex: true,
+  })
   .then(() =>
     console.log("database is up and running...", mongoose.connection.readyState)
   )
